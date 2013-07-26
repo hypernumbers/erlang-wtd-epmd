@@ -1,0 +1,12 @@
+{application, erlang_wtd_epmd,
+ [
+  {description, ""},
+  {vsn, "1"},
+  {registered, []},
+  {applications, [
+                  kernel,
+                  stdlib
+                 ]},
+  {mod, { erlang_wtd_epmd_app, []}},
+  {env, []}
+ ]}.
