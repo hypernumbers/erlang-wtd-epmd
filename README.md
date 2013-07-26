@@ -1,4 +1,6 @@
-erlang-wtd-epmd
+Erlang WTD EPMD
 ===============
 
-A proxy server and epmd-a-like for erlang-wtd
+This is a proxy server and epmd-a-like for erlang-wtd.
+
+Please see http://github.com:/hypernumbers/erlang-wtd for details.
