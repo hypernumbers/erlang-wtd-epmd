@@ -8,4 +8,4 @@ Please see http://github.com:/hypernumbers/erlang-wtd for details.
 Bagsies
 -------
 
-The User Port no 14151 is unassigned and has been bagsied by me. Anybody caught teifing it will be a deadleg and a Chinese burn.
+The User Port no 14151, 14152 and 14153 are unassigned and have been bagsied by me. Anybody caught teifing any of 'em will be given a deadleg and a Chinese burn.
