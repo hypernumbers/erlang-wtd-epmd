@@ -1,6 +1,6 @@
 {application, erlang_wtd_epmd,
  [
-  {description, ""},
+  {description, "an epmd-a-like for erlang-wtd"},
   {vsn, "1"},
   {registered, []},
   {applications, [

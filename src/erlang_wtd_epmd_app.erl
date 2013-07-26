@@ -1,3 +1,10 @@
+%%% @author    Gordon Guthrie
+%%% @copyright (C) 2013, Gordon Guthrie
+%%% @doc
+%%%
+%%% @end
+%%% Created : 26 Jul 2013 by gordonguthrie@backawinner.gg
+
 -module(erlang_wtd_epmd_app).
 
 -behaviour(application).
