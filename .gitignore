@@ -1,6 +1,8 @@
+shell
 .eunit
 deps
 ebin/
+var/
 *.o
 *.beam
 *.plt
