@@ -13,7 +13,7 @@ main([]) ->
     "\"erl -name " ++ Node ++ " -smp "  ++
         "-pa ./ebin -pa ./deps/*/ebin " ++
         "-s erlang_wtd_epmd_app " ++
-        "-config var/sys.config\"",
+        "-config var/sys\"",
 
     case os:cmd(Cmd) of
         []   ->
