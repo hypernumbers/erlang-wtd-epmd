@@ -4,6 +4,8 @@
 main([]) ->
 
     ensure_config(),
+    ensure_docroot(),
+
     Node = atom_to_list(conf_lname()),
     PipeDir = "/tmp/" ++ Node ++ "/",
     filelib:ensure_dir("var/runerl_log/"),
@@ -29,6 +31,15 @@ make_shell(NodeName) ->
     file:write_file("shell", Shell),
     os:cmd("chmod +x shell").
 
+ensure_docroot() ->
+    case has_docroot() of
+        false -> copy_default_docroot();
+        true  -> ok
+    end.
+
+has_docroot() ->
+    filelib:is_dir(docroot_path()).
+
 ensure_config() ->
     case has_config() of
         false -> copy_default_config();
@@ -38,8 +49,17 @@ ensure_config() ->
 has_config() ->
     filelib:is_file(config_file()).
 
+docroot_path() ->
+    [root(), "/var/docroot/"].
+
+
 config_file() ->
     [root(), "/var/", "sys.config"].
+
+copy_default_docroot() ->
+    ok = filelib:ensure_dir(docroot_path()),
+    DefaultDocroot = root() ++ "/priv/docroot/*",
+    os:cmd("cp -R " ++ DefaultDocroot ++ " " ++ docroot_path()).
 
 copy_default_config() ->
     ok = filelib:ensure_dir([root(), "/var/"]),

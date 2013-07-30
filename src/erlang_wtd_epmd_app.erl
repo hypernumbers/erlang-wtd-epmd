@@ -15,6 +15,9 @@
          stop/1
         ]).
 
+-define(ALLHOSTS, '_').
+-define(ALLPATHS, '_').
+
 %% ===================================================================
 %% Application callbacks
 %% ===================================================================
@@ -34,21 +37,7 @@ start(_StartType, _StartArgs) ->
 
     Port = 14151,
 
-    %Dispatch = cowboy_router:compile([{'_', [{'_', web_page, []}]}]),
-
-    Directory = {directory, "/home/vagrant/erlang-wtd-epmd/var/docroot/"},
-    MimeTypes = {mimetypes, {fun mimetypes:path_to_mimes/2, default}},
-
-    io:format("Directory is ~p MimeTypes is ~p~n", [Directory, MimeTypes]),
-
-    Dispatch = [{'_', [
-                       {"/[...]", cowboy_static, [
-                                                  Directory,
-                                                  MimeTypes
-                                                 ]}
-                      ]}
-               ],
-
+    Dispatch = cowboy_router:compile([{?ALLHOSTS, [{?ALLPATHS, web_page, []}]}]),
     CDispatch = cowboy_router:compile(Dispatch),
 
     {ok, _PID} = cowboy:start_http(web_page_listener, 100,
