@@ -1,9 +1,11 @@
 %% -*- erlang -*-
-[{erlang_wtd_epmd,
+[{wtdepmd,
   [
    {nodename, epmd},
 
    {environment, dev},      % production | dev
+
+   {www_root, "/home/vagrant/erlang-wtd-epmd/var/docroot/_assets/"},
 
    {web_page_port,  14151},
    {wtd_epmd_port,  14152},

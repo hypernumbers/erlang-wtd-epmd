@@ -14,7 +14,7 @@ main([]) ->
     Cmd = "run_erl -daemon " ++ PipeDir ++ " var/runerl_log " ++
     "\"erl -name " ++ Node ++ " -smp "  ++
         "-pa ./ebin -pa ./deps/*/ebin " ++
-        "-s erlang_wtd_epmd_app " ++
+        "-s wtdepmd_app " ++
         "-config var/sys\"",
 
     case os:cmd(Cmd) of
@@ -22,7 +22,7 @@ main([]) ->
             ok,
             make_shell(Node);
         Else ->
-            io:format("erlang-wtd-epmd failed to boot:~n~s~n", [Else]),
+            io:format("wtdepmd failed to boot:~n~s~n", [Else]),
             ok
     end.
 
@@ -76,9 +76,9 @@ nodeatom(Name) ->
     list_to_atom(lists:flatten(LongName)).
 
 read_config(Key) ->
-    {ok, [Config]}          = file:consult(config_file()),
-    {erlang_wtd_epmd, Conf} = lists:keyfind(erlang_wtd_epmd, 1, Config),
-    {Key, Val}              = lists:keyfind(Key, 1, Conf),
+    {ok, [Config]}  = file:consult(config_file()),
+    {wtdepmd, Conf} = lists:keyfind(wtdepmd, 1, Config),
+    {Key, Val}      = lists:keyfind(Key, 1, Conf),
     Val.
 
 root() ->

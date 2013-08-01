@@ -5,7 +5,7 @@
 %%% @end
 %%% Created : 26 Jul 2013 by gordonguthrie@backawinner.gg
 
--module(erlang_wtd_epmd_sup).
+-module(wtdepmd_sup).
 
 -behaviour(supervisor).
 
@@ -28,6 +28,7 @@ start_link() ->
 %% ===================================================================
 %% Supervisor callbacks
 %% ===================================================================
+
 
 init([]) ->
     {ok, { {one_for_one, 5, 10}, []} }.

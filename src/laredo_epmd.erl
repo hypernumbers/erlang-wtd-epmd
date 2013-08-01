@@ -100,7 +100,7 @@ get_page() ->
 %%% Page defaults
 %%%
 %%%-----------------------------------------------------------------------------
-title() -> "<title>Laredo</title>".
+title() -> "<title>WTD EMPD Management Console</title>".
 
 language() -> "en".
 
@@ -110,9 +110,9 @@ viewport() -> none.
 
 javascript_head() -> ?NOJAVASCRIPT.
 
-javascript_foot() -> ?NOJAVASCRIPT.
+javascript_foot() -> ["./_assets/js/bootstrap.js"].
 
-css() -> ?NOCSS.
+css() -> ["./_assets/css/bootstrap.css"].
 %%%-----------------------------------------------------------------------------
 %%%
 %%% Panel defaults
