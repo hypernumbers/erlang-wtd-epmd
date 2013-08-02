@@ -12,11 +12,6 @@
 -define(NOJAVASCRIPT, []).
 -define(NOCSS,        []).
 
-%% export the behaviour
--export([
-         behaviour_info/1
-        ]).
-
 %% export for getting the default page structure
 -export([
          get_page/0
@@ -27,7 +22,6 @@
          title/0,
          language/0,
          meta/0,
-         viewport/0,
          javascript_head/0,
          javascript_foot/0,
          css/0
@@ -48,41 +42,6 @@
          footer/0
         ]).
 
-
-%%%-----------------------------------------------------------------------------
-%%%
-%%% Behaviour definition
-%%%
-%%% If you want to define your own template then create a new module
-%%% that implements the laredo behaviour
-%%%
-%%%-----------------------------------------------------------------------------
-
-behaviour_info(callbacks) ->
-    [
-     {get_page,        0},
-     {title,           0},
-     {language,        0},
-     {meta,            0},
-     {viewport,        0},
-     {javascript_head, 0},
-     {javascript_foot, 0},
-     {css,             0},
-     {header,          0},
-     {navigation,      0},
-     {mainbody,        0},
-     {search,          0},
-     {sidebar1,        0},
-     {sidebar2,        0},
-     {sidebar3,        0},
-     {adverts1,        0},
-     {adverts2,        0},
-     {adverts3,        0},
-     {footer,          0}
-    ];
-behaviour_info(_Other) ->
-    undefined.
-
 %%%-----------------------------------------------------------------------------
 %%%
 %%% Default Page
@@ -90,9 +49,21 @@ behaviour_info(_Other) ->
 %%%-----------------------------------------------------------------------------
 get_page() ->
     [
-     #pagediv{contents = header},
-     #pagediv{contents = mainbody},
-     #pagediv{contents = footer}
+     #dv{class    = "container-fluid",
+         contents = [
+                     #dv{id       = "content",
+                         class    = "clearfix row-fluid",
+                         contents = [
+                                     #dv{id       = "main",
+                                         class    = "span12 clearfix",
+                                         role     = "main",
+                                         contents = [
+                                                     #dv{contents = header},
+                                                     #dv{contents = mainbody},
+                                                     #dv{contents = footer}
+                                                    ]}
+                                    ]}
+                    ]}
     ].
 
 %%%-----------------------------------------------------------------------------
@@ -104,27 +75,31 @@ title() -> "<title>WTD EMPD Management Console</title>".
 
 language() -> "en".
 
-meta() -> none.
+meta() -> "<meta name='viewport' "
+              ++ "content='width=device-width, initial-scale=1.0'>".
 
-viewport() -> none.
-
-javascript_head() -> ?NOJAVASCRIPT.
+javascript_head() -> [].
 
 javascript_foot() -> ["./_assets/js/bootstrap.js"].
 
-css() -> ["./_assets/css/bootstrap.css"].
+css() -> [
+          "./_assets/css/bootstrap.css",
+          "./_assets/css/bootstrap-responsive.css"
+         ].
+
 %%%-----------------------------------------------------------------------------
 %%%
 %%% Panel defaults
 %%%
 %%%-----------------------------------------------------------------------------
-header() -> #webpanel{content_type = html,
-                      content      = "WTD EPMD Management Consolde"}.
+header() -> Header = laredo_bootstrap3:hero("Management Console",
+                                           "for your (Erlang) WTD EPMD Proxy"),
+            #webpanel{content_type = html,
+                      content      = Header}.
 
 navigation() -> none.
 
-mainbody() -> #webpanel{content_type = html,
-                        content      = "<h1>Hey!</h1><p>How you doing?</p>"}.
+mainbody() -> none.
 
 search() -> none.
 
@@ -141,4 +116,4 @@ adverts2() -> none.
 adverts3() -> none.
 
 footer() -> #webpanel{content_type = html,
-                      content      = "<div>A footer</div>"}.
+                      content      = "<div class='muted'>Source code availalbe from <a href='http://github.com/hypernumbers/erlang-wtd-epmd'>Github</a>. This is a proxy server for <a href-'http://github.com:/hypernumbers/erlang-wtd'>(Erlang)WTD.</div>"}.

@@ -21,7 +21,14 @@ init({tcp, http}, Req, _Opts) ->
     {ok, Req, undefined_state}.
 
 handle(Req, State) ->
-    Panel = #webpanel{content = "<h1>Howdy Hombre</h1>"},
+    Field1 = laredo_bootstrap3:form_field("Email", "Enter your email...",
+                                          "We will send you a security key " ++
+                                              " (and nothing else)"),
+    Form = laredo_bootstrap3:form("Register your server(s)", [Field1],
+                                 "Give Me Superpowers!"),
+    Form2 = laredo_bootstrap3:well(Form),
+
+    Panel = #webpanel{content = Form2},
     Body = #webbody{mainbody = Panel},
     Page = #webpage{template = laredo_epmd, webbody = Body},
     HTML = laredo_api:render_page(Page),
