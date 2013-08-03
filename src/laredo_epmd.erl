@@ -48,6 +48,20 @@
 %%%
 %%%-----------------------------------------------------------------------------
 get_page() ->
+
+    Body = [
+            #dv{contents = header},
+            #dv{class    = "row-fluid",
+                contents = [
+                            #dv{class    = "span8 clearfix",
+                                contents = sidebar1},
+                            #dv{class    = "span4",
+                                contents = mainbody}
+                           ]},
+            #dv{class    = "span12 clearfix",
+                contents = footer}
+           ],
+
     [
      #dv{class    = "container-fluid",
          contents = [
@@ -55,13 +69,8 @@ get_page() ->
                          class    = "clearfix row-fluid",
                          contents = [
                                      #dv{id       = "main",
-                                         class    = "span12 clearfix",
                                          role     = "main",
-                                         contents = [
-                                                     #dv{contents = header},
-                                                     #dv{contents = mainbody},
-                                                     #dv{contents = footer}
-                                                    ]}
+                                         contents = Body}
                                     ]}
                     ]}
     ].
@@ -80,11 +89,11 @@ meta() -> "<meta name='viewport' "
 
 javascript_head() -> [].
 
-javascript_foot() -> ["./_assets/js/bootstrap.js"].
+javascript_foot() -> ["./_assets/bootstrap/js/bootstrap.js"].
 
 css() -> [
-          "./_assets/css/bootstrap.css",
-          "./_assets/css/bootstrap-responsive.css"
+          "./_assets/bootstrap/css/bootstrap.css",
+          "./_assets/bootstrap/css/bootstrap-responsive.css"
          ].
 
 %%%-----------------------------------------------------------------------------
@@ -93,7 +102,7 @@ css() -> [
 %%%
 %%%-----------------------------------------------------------------------------
 header() -> Header = laredo_bootstrap3:hero("Management Console",
-                                           "for your (Erlang) WTD EPMD Proxy"),
+                                           "for an (Erlang) WTD EPMD/Proxy"),
             #webpanel{content_type = html,
                       content      = Header}.
 
@@ -103,7 +112,9 @@ mainbody() -> none.
 
 search() -> none.
 
-sidebar1() -> none.
+sidebar1() -> #webpanel{content_type = html,
+                        content      = "<p>Put in registered VM's here.</p>"}.
+
 
 sidebar2() -> none.
 
@@ -116,4 +127,4 @@ adverts2() -> none.
 adverts3() -> none.
 
 footer() -> #webpanel{content_type = html,
-                      content      = "<div class='muted'>Source code availalbe from <a href='http://github.com/hypernumbers/erlang-wtd-epmd'>Github</a>. This is a proxy server for <a href-'http://github.com:/hypernumbers/erlang-wtd'>(Erlang)WTD.</div>"}.
+                      content      = "<div class='muted'>Source code available from <a href='http://github.com/hypernumbers/erlang-wtd-epmd'>Github</a>. This is a proxy server for <a href-'http://github.com:/hypernumbers/erlang-wtd'>(Erlang)WTD.</div>"}.
