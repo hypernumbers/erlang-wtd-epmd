@@ -87,9 +87,12 @@ language() -> "en".
 meta() -> "<meta name='viewport' "
               ++ "content='width=device-width, initial-scale=1.0'>".
 
-javascript_head() -> [].
+javascript_head() -> ["./_assets/laredo/js/laredo.js"].
 
-javascript_foot() -> ["./_assets/bootstrap/js/bootstrap.js"].
+javascript_foot() -> [
+                      "./_assets/jquery/js/jquery-1.10.2.min.js",
+                      "./_assets/bootstrap/js/bootstrap.js"
+                     ].
 
 css() -> [
           "./_assets/bootstrap/css/bootstrap.css",
@@ -127,4 +130,4 @@ adverts2() -> none.
 adverts3() -> none.
 
 footer() -> #webpanel{content_type = html,
-                      content      = "<div class='muted'>Source code available from <a href='http://github.com/hypernumbers/erlang-wtd-epmd'>Github</a>. This is a proxy server for <a href-'http://github.com:/hypernumbers/erlang-wtd'>(Erlang)WTD.</div>"}.
+                      content      = "<div class='muted'>Source code available from <a href='http://github.com/hypernumbers/erlang-wtd-epmd'>Github</a>. This is a proxy server for <a href='http://github.com/hypernumbers/erlang-wtd'>(Erlang)WTD.</a></div>"}.
