@@ -8,7 +8,8 @@
 -module(epmd_utils).
 
 -export([
-         recursive_copy/2
+         recursive_copy/2,
+         get_www_root/0
         ]).
 
 %% Recursively copy directories
@@ -42,3 +43,9 @@ rec_copy1(From, To, File) ->
                     ok
             end
     end.
+
+get_www_root() ->
+{ok, Root} = file:get_cwd(),
+    Root ++ "/" ++
+        filename:dirname(code:where_is_file("wtdepmd.app")) ++
+        "/../var/docroot/".

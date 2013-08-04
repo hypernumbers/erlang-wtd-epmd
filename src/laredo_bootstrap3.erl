@@ -59,6 +59,9 @@
                a/5
               ]).
 
+-define(MEGA, 1000000000000).
+-define(SEC,  1000000).
+
 hero(Headline) ->
     hero(Headline, []).
 
@@ -82,10 +85,19 @@ form(Legend, Fields, ButtonTxt) ->
         "<fieldset>" ++
         "<legend>" ++ Legend ++ "</legend>" ++
         lists:flatten(Fields) ++
-        "<button type='submit' class='btn'>" ++ ButtonTxt ++
+        "<button id='" ++ get_id("Button") ++ "' type='submit' " ++
+        "class='btn laredo-submit'>" ++
+        ButtonTxt ++
         "</button>" ++
         "</fieldset>" ++
         "</form>".
 
 well(HTML) ->
     "<div class='well'>" ++ lists:flatten(HTML) ++ "</div>".
+
+get_id(Prefix) when is_list(Prefix) ->
+    Prefix ++ integer_to_list(timestamp()).
+
+timestamp() ->
+    {Mega, Sec, Micro} = now(),
+    ?MEGA * Mega + ?SEC * Sec + Micro.

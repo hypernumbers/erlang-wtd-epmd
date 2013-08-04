@@ -12,21 +12,22 @@
         ]).
 
 -define(JSDIR, "var/docroot/_assets/laredo/js/").
--define(COFFEEDIR, "priv/coffeeroot/").
+-define(COFFEEDIR, "priv/coffeeroot/laredo-bootstrap/").
 
 make_coffee(_A, _B) ->
     case has_coffeescript() of
         true  -> ok = clear_old_js(),
                  ok = filelib:ensure_dir(?JSDIR),
-                 ok = brew(),
-                 ok;
+                 ok = brew();
         false -> ok
     end.
 
 brew() ->
-    Files = filelib:wildcard("*.coffee", ?COFFEEDIR),
-    CMD = "coffee -m -o " ++ ?JSDIR ++ " -c " ++ ?COFFEEDIR,
-    [os:cmd(CMD ++ X) || X <- Files],
+    {ok, Dir} = file:get_cwd(),
+    ok = file:set_cwd("./priv/coffeeroot"),
+    Output = os:cmd("cake build"),
+    io:format("~p~n", [Output]),
+    ok = file:set_cwd(Dir),
     ok.
 
 clear_old_js() ->

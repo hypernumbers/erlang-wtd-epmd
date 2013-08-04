@@ -25,10 +25,9 @@
 start() ->
     application:start(wtdepmd),
 
-    {ok, Port}   = application:get_env(wtdepmd, web_page_port),
-    {ok, WWWDir} = application:get_env(wtdepmd, www_root),
+    {ok, Port} = application:get_env(wtdepmd, web_page_port),
+    Dir        = {directory, epmd_utils:get_www_root() ++ "_assets/"},
 
-    Dir = {directory, WWWDir},
     Mimetypes = {mimetypes, {fun mimetypes:path_to_mimes/2, default}},
 
     D = [
@@ -52,3 +51,4 @@ start(_StartType, _StartArgs) ->
 
 stop(_State) ->
     ok.
+
