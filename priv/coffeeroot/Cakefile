@@ -35,7 +35,7 @@ task 'watch', 'Watch prod source files and build changes', ->
                 grrrr 'Whoa. Saw a change. Building. Hold plz.'
                 invoke 'build'
 
-task 'build', 'Build single application file from source files', ->
+task 'bake', 'Build single application file from source files', ->
   invoke 'coffeeFiles'
   appContents = new Array remaining = appFiles.length
   for file, index in appFiles then do (file, index) ->

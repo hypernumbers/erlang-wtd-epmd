@@ -87,11 +87,12 @@ language() -> "en".
 meta() -> "<meta name='viewport' "
               ++ "content='width=device-width, initial-scale=1.0'>".
 
-javascript_head() -> ["./_assets/laredo/js/laredo.js"].
+javascript_head() -> [].
 
 javascript_foot() -> [
                       "./_assets/jquery/js/jquery-1.10.2.min.js",
-                      "./_assets/bootstrap/js/bootstrap.js"
+                      "./_assets/bootstrap/js/bootstrap.js",
+                      "./_assets/laredo/js/laredo.js"
                      ].
 
 css() -> [

@@ -43,6 +43,7 @@ handle_get(Req, State) ->
     {ok, Req2, State}.
 
 handle_post(Req, State) ->
+    io:format("Got a post...~n"),
     ok.
 
 terminate(_Reason, _Req, _State) ->

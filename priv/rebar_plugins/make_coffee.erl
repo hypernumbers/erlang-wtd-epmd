@@ -25,7 +25,7 @@ make_coffee(_A, _B) ->
 brew() ->
     {ok, Dir} = file:get_cwd(),
     ok = file:set_cwd("./priv/coffeeroot"),
-    Output = os:cmd("cake build"),
+    Output = os:cmd("cake bake"),
     io:format("~p~n", [Output]),
     ok = file:set_cwd(Dir),
     ok.

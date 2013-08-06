@@ -81,11 +81,11 @@ form_checkbox(Text) ->
         "</label>".
 
 form(Legend, Fields, ButtonTxt) ->
-    "<form>" ++
+    "<form id='" ++ get_id("Form") ++ "'>" ++
         "<fieldset>" ++
         "<legend>" ++ Legend ++ "</legend>" ++
         lists:flatten(Fields) ++
-        "<button id='" ++ get_id("Button") ++ "' type='submit' " ++
+        "<button type='button' " ++
         "class='btn laredo-submit'>" ++
         ButtonTxt ++
         "</button>" ++
