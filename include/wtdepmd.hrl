@@ -9,6 +9,7 @@
         {
           name,
           verified,
+          available,
           public_key,
           private_key
         }).
