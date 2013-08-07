@@ -9,7 +9,7 @@
 
 -behaviour(application).
 
--include("wtdepmd.hrl").
+-include("registry.hrl").
 
 %% Application callbacks
 -export([

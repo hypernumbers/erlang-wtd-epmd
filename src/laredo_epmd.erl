@@ -54,9 +54,9 @@ get_page() ->
             #dv{class    = "row-fluid",
                 contents = [
                             #dv{class    = "span8 clearfix",
-                                contents = sidebar1},
+                                contents = mainbody},
                             #dv{class    = "span4",
-                                contents = mainbody}
+                                contents = sidebar1}
                            ]},
             #dv{class    = "span12 clearfix",
                 contents = footer}
@@ -116,9 +116,15 @@ mainbody() -> none.
 
 search() -> none.
 
-sidebar1() -> #webpanel{content_type = html,
-                        content      = "<p>Put in registered VM's here.</p>"}.
-
+sidebar1() ->
+    Field1 = laredo_bootstrap3:form_field("Email", "Enter your email...",
+                                          "We will send you a security key " ++
+                                              " (and nothing else)"),
+    Form   = laredo_bootstrap3:form("Register your server(s)", [Field1],
+                                    "Give Me Superpowers!"),
+    Form2  = laredo_bootstrap3:well(Form),
+    #webpanel{content_type = html,
+              content      = Form2}.
 
 sidebar2() -> none.
 
