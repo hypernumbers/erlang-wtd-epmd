@@ -47,7 +47,24 @@
          a/2,
          a/3,
          a/4,
-         a/5
+         a/5,
+
+         table/1,
+         table/2,
+         table/3,
+
+         th/1,
+         th/2,
+         th/3,
+
+         tr/1,
+         tr/2,
+         tr/3,
+
+         td/1,
+         td/2,
+         td/3
+
         ]).
 
 header([])      -> [];
@@ -126,6 +143,34 @@ a(URL, Text, Alt, Id, Class) when is_list(URL)  andalso
                                   is_list(Class) ->
     "<a href='" ++ URL ++ "' " ++ id(Id) ++ " " ++ class(Class) ++ " " ++
         alt(Alt) ++ " >" ++ Text ++ "</a>".
+
+table([])      -> [];
+table(Content) -> table(Content, []).
+
+table(Content, Id) -> table(Content, Id, []).
+
+table(Content, Id, Class) -> make("table", Id, Class, Content).
+
+th([])      -> [];
+th(Content) -> th(Content, []).
+
+th(Content, Id) -> th(Content, Id, []).
+
+th(Content, Id, Class) -> make("th", Id, Class, Content).
+
+tr([])      -> [];
+tr(Content) -> tr(Content, []).
+
+tr(Content, Id) -> tr(Content, Id, []).
+
+tr(Content, Id, Class) -> make("tr", Id, Class, Content).
+
+td([])      -> [];
+td(Content) -> td(Content, []).
+
+td(Content, Id) -> td(Content, Id, []).
+
+td(Content, Id, Class) -> make("td", Id, Class, Content).
 
 
 %%

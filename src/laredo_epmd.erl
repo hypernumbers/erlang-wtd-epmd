@@ -137,4 +137,4 @@ adverts2() -> none.
 adverts3() -> none.
 
 footer() -> #webpanel{content_type = html,
-                      content      = "<div class='muted'>Source code available from <a href='http://github.com/hypernumbers/erlang-wtd-epmd'>Github</a>. This is a proxy server for <a href='http://github.com/hypernumbers/erlang-wtd'>(Erlang)WTD.</a></div>"}.
+                      content      = "<div class='muted'>Source code available from <a href='http://github.com/hypernumbers/erlang-wtd-epmd'>Github</a>. This is a management, proxy and epmd server for <a href='http://github.com/hypernumbers/erlang-wtd'>(Erlang)WTD.</a></div>"}.

@@ -12,6 +12,9 @@
 -include("registry.hrl").
 -include_lib("laredo/include/laredo.hrl").
 
+-define(HEAD, "Management Console").
+-define(STRAP, "for an (Erlang) WTD EPMD/Proxy").
+
 -export([
          init/3,
          handle/2,
@@ -30,16 +33,19 @@ handle(Req, State) ->
 
 handle_get(Req, State) ->
 
-    Panel = #webpanel{content = list_available()},
-    Body  = #webbody{mainbody = Panel},
-    Page  = #webpage{template = laredo_epmd, webbody = Body},
-    HTML  = laredo_api:render_page(Page),
+    Header = laredo_bootstrap3:hero(?HEAD, ?STRAP),
+    Hdr    = #webpanel{content = Header},
+    Panel  = #webpanel{content = list_available()},
+    Body   = #webbody{mainbody = Panel,
+                      header   = Hdr},
+    Page   = #webpage{template = laredo_epmd,
+                      webbody = Body},
+    HTML   = laredo_api:render_page(Page),
     {ok, Req2} = cowboy_req:reply(200, [], HTML, Req),
     {ok, Req2, State}.
 
-handle_post(_Req, _State) ->
-    io:format("Got a post...~n"),
-    ok.
+handle_post(Req, State) ->
+    http_utils:'404'(?HEAD, ?STRAP, Req, State).
 
 terminate(_Reason, _Req, _State) ->
     ok.
@@ -50,33 +56,25 @@ terminate(_Reason, _Req, _State) ->
 
 list_available() ->
     List = registry:list_availableDB(),
-    Header = tr([
-                 th("Name"),
-                 th("Verified"),
-                 th("Available"),
-                 th("Public"),
-                 th("Private")
+    Header = html:tr([
+                 html:th("Name"),
+                 html:th("Verified"),
+                 html:th("Available"),
+                 html:th("Public"),
+                 html:th("Private")
                 ]),
-    TabBody = [tr([
-                   td(N),
-                   td(V),
-                   td(A),
-                   td(PubK),
-                   td(PrivK)
+    TabBody = [html:tr([
+                   html:td(N),
+                   html:td(atom_to_list(V)),
+                   html:td(atom_to_list(A)),
+                   html:td(PubK),
+                   html:td(PrivK)
                   ])
                || #registry{name         = N,
                             verified     = V,
                             is_available = A,
                             public_key   = PubK,
                             private_key  = PrivK} <- List],
-    _HTML = "<table class='table table-striped'>"
-        ++ lists:flatten([Header, TabBody])
-        ++ "</table>".
+    Content = lists:flatten([Header, TabBody]),
+    _HTML = html:table(Content, [], "table table-striped").
 
-th(X) when is_atom(X) -> "<th>" ++ atom_to_list(X) ++ "</th>";
-th(X) when is_list(X) -> "<th>" ++ X ++ "</th>".
-
-td(X) when is_atom(X) -> "<td>" ++ atom_to_list(X) ++ "</td>";
-td(X) when is_list(X) -> "<td>" ++ X ++ "</td>".
-
-tr(X) when is_list(X) -> "<td>" ++ X ++ "</tr>".

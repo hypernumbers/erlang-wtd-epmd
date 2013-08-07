@@ -27,12 +27,14 @@
 start() ->
     application:start(wtdepmd),
     application:start(mnesia),
-    Debug = case application:get_env(wtdepmd, startup_debug) of
-                {ok, true} -> true;
-                _          -> false
-            end,
-    ok = start_mnesia(Debug),
-    ok = start_web_gui(Debug).
+    DebugOn = case application:get_env(wtdepmd, startup_debug) of
+                  {ok, true} -> true;
+                  _          -> false
+              end,
+    ok = start_mnesia(DebugOn),
+    ok = start_web_gui(DebugOn),
+    ok = start_proxy(DebugOn),
+    ok = start_epmd(DebugOn).
 
 start(_StartType, _StartArgs) ->
     ok = application:start(crypto),
@@ -43,44 +45,88 @@ start(_StartType, _StartArgs) ->
 stop(_State) ->
     ok.
 
-start_web_gui(Debug) ->
-    msg(Debug, "WTD EPMD Debug: Starting web gui~n"),
-    {ok, Port} = application:get_env(wtdepmd, web_page_port),
-    Dir        = {directory, epmd_utils:get_www_root() ++ "_assets/"},
+start_web_gui(DebugOn) ->
 
-    Mimetypes = {mimetypes, {fun mimetypes:path_to_mimes/2, default}},
+    msg(DebugOn, "WTD EPMD Debug: Starting web gui~n"),
+
+    {ok, WebPort}   = application:get_env(wtdepmd, web_page_port),
+
+    AssetDirective = get_asset_directive(),
 
     D = [
          {?ALLHOSTS, [
-                      {?ASSETS,   cowboy_static, [Dir, Mimetypes]},
-                      {?ALLPATHS, web_page,      []}]}
+                      AssetDirective,
+                      {?ALLPATHS, web_page, []}]}
         ],
+
 
     CDispatch = cowboy_router:compile(D),
 
     {ok, _PID} = cowboy:start_http(web_page_listener, 100,
-                                   [{port, Port}],
+                                   [{port, WebPort}],
                                    [{env, [{dispatch, CDispatch}]}]),
     ok.
 
-ensure_dir(Debug) ->
-    msg(Debug, "WTD EPMD Debug: make sure the mnesia directory exists...~n"),
+start_proxy(DebugOn) ->
+
+    msg(DebugOn, "WTD EPMD Debug: starting proxy~n"),
+
+    {ok, ProxyPort} = application:get_env(wtdepmd, wtd_proxy_port),
+
+    AssetDirective = get_asset_directive(),
+
+    D = [
+         {?ALLHOSTS, [
+                      AssetDirective,
+                      {?ALLPATHS, wtd_proxy, []}]}
+        ],
+
+    CDispatch = cowboy_router:compile(D),
+    {ok, _PID} = cowboy:start_http(proxy_listener, 100,
+                                   [{port, ProxyPort}],
+                                   [{env, [{dispatch, CDispatch}]}]),
+    ok.
+
+start_epmd(DebugOn) ->
+
+    msg(DebugOn, "WTD EPMD Debug: starting epmd~n"),
+
+    {ok, EPMDPort}  = application:get_env(wtdepmd, wtd_epmd_port),
+
+    AssetDirective = get_asset_directive(),
+
+    D = [
+         {?ALLHOSTS, [
+                      AssetDirective,
+                      {"/", epmd, []}]}
+        ],
+
+    CDispatch = cowboy_router:compile(D),
+    {ok, _PID} = cowboy:start_http(epmd_listener, 100,
+                                   [{port, EPMDPort}],
+                                   [{env, [{dispatch, CDispatch}]}]),
+    ok.
+
+ensure_dir(DebugOn) ->
+
+    msg(DebugOn, "WTD EPMD Debug: make sure the mnesia directory exists...~n"),
+
     {ok, Dir} = application:get_env(mnesia, dir),
     filelib:ensure_dir(Dir).
 
-start_mnesia(Debug) ->
-    ok = ensure_dir(Debug),
-    ok = ensure_schema(Debug),
-    ok = maybe_create_table(Debug),
+start_mnesia(DebugOn) ->
+    ok = ensure_dir(DebugOn),
+    ok = ensure_schema(DebugOn),
+    ok = maybe_create_table(DebugOn),
     ok.
 
-ensure_schema(Debug) ->
+ensure_schema(DebugOn) ->
     case mnesia:system_info(tables) of
         [schema] ->
-            msg(Debug, "WTD EPMD Debug: plain schema~n"),
+            msg(DebugOn, "WTD EPMD Debug: plain schema~n"),
             build_schema();
         Tables ->
-            msg(Debug, "WTD EPMD Debug: starting tables~n-~p~n", [Tables]),
+            msg(DebugOn, "WTD EPMD Debug: starting tables~n-~p~n", [Tables]),
             mnesia:wait_for_tables(Tables, infinity)
     end,
     ok.
@@ -91,7 +137,7 @@ build_schema() ->
     ok = mnesia:create_schema([node()]),
     ok = application:start(mnesia).
 
-maybe_create_table(Debug) ->
+maybe_create_table(DebugOn) ->
     Name = registry,
     TblDef = [
               {record_name,      registry},
@@ -103,9 +149,9 @@ maybe_create_table(Debug) ->
              ],
     case mnesia:create_table(Name, TblDef) of
         {atomic, ok} ->
-            msg(Debug, "WTD EPMD Debug: table created~n");
+            msg(DebugOn, "WTD EPMD Debug: table created~n");
         {aborted, {already_exists, _}} ->
-            msg(Debug, "WTD EPMD Debug: table exists~n");
+            msg(DebugOn, "WTD EPMD Debug: table exists~n");
         {aborted, Reason} ->
             throw(Reason)
     end.
@@ -115,3 +161,10 @@ msg(true, Msg) -> io:format(Msg).
 
 msg(false, _, _)     -> ok;
 msg(true, Msg, Vals) -> io:format(Msg, Vals).
+
+get_asset_directive() ->
+    Dir       = {directory, epmd_utils:get_www_root() ++ "_assets/"},
+    Mimetypes = {mimetypes, {fun mimetypes:path_to_mimes/2, default}},
+    {?ASSETS,   cowboy_static, [Dir, Mimetypes]}.
+
+
