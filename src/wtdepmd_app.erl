@@ -98,7 +98,7 @@ start_epmd(DebugOn) ->
     D = [
          {?ALLHOSTS, [
                       AssetDirective,
-                      {"/", epmd, []}]}
+                      {?ALLPATHS, epmd, []}]}
         ],
 
     CDispatch = cowboy_router:compile(D),

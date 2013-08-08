@@ -32,17 +32,29 @@ handle(Req, State) ->
     end.
 
 handle_get(Req, State) ->
+    {Headers, _} = cowboy_req:headers(Req),
+    {Path, _}    = cowboy_req:path(Req),
+    io:format("Headers is ~p~n", [Headers]),
+    io:format("Path is ~p~n", [Path]),
     http_utils:'404'(?HEAD, ?STRAP, Req, State).
 
 handle_post(Req, State) ->
+    {Path, _}    = cowboy_req:path(Req),
+    case Path of
+        <<"/">> -> handle_p(Req, State);
+        _       -> http_utils:'404'(?HEAD, ?STRAP, Req, State)
+    end.
+
+handle_p(Req, State) ->
     {ContentType, _} = cowboy_req:header(<<"content-type">>, Req),
     {Accept, _}      = cowboy_req:header(<<"accept">>, Req),
-    Resp = "{'response': 'ok'}",
+    io:format("ContentType is ~p Accept is ~p~n", [ContentType, Accept]),
+    Resp = "{'ok': 'ya bas'}",
     Hdrs = [{<<"content-type">>, ContentType}],
     case {http_utils:matches_json(ContentType),
           http_utils:matches_json(Accept)} of
         {true, true} -> {ok, Req2} = cowboy_req:reply(200, Hdrs, Resp, Req),
-                        {ok, Req2, State};
+                                {ok, Req2, State};
         _            -> http_utils:'404'(?HEAD, ?STRAP, Req, State)
     end.
 

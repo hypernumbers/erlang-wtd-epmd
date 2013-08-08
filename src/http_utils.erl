@@ -14,9 +14,9 @@
 
 -include_lib("laredo/include/laredo.hrl").
 
-matches_json(Content) when is_binary(Content) ->
-    Components = binary:split(Content, <<";">>),
-    matches_j2(Components).
+matches_json(undefined)           -> false;
+matches_json(B) when is_binary(B) -> B2 = binary:split(B, <<";">>),
+                                     matches_j2(B2).
 
 matches_j2([])                            -> false;
 matches_j2([<<"application/json">> | _T]) -> true;

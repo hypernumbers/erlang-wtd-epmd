@@ -90,14 +90,14 @@ meta() -> "<meta name='viewport' "
 javascript_head() -> [].
 
 javascript_foot() -> [
-                      "./_assets/jquery/js/jquery-1.10.2.min.js",
-                      "./_assets/bootstrap/js/bootstrap.js",
-                      "./_assets/laredo/js/laredo.js"
+                      "/_assets/jquery/js/jquery-1.10.2.min.js",
+                      "/_assets/bootstrap/js/bootstrap.js",
+                      "/_assets/laredo/js/laredo.js"
                      ].
 
 css() -> [
-          "./_assets/bootstrap/css/bootstrap.css",
-          "./_assets/bootstrap/css/bootstrap-responsive.css"
+          "/_assets/bootstrap/css/bootstrap.css",
+          "/_assets/bootstrap/css/bootstrap-responsive.css"
          ].
 
 %%%-----------------------------------------------------------------------------
