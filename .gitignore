@@ -3,6 +3,7 @@ shell
 deps
 ebin/
 var/
+logs/
 *.o
 *.beam
 *.plt

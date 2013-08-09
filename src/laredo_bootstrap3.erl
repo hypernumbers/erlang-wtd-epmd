@@ -14,6 +14,8 @@
          form_field/3,
          form_checkbox/1,
          form/3
+         %% table_from_lists/1,
+         %% record/1
         ]).
 
 -import(html, [

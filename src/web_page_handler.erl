@@ -5,14 +5,14 @@
 %%% @end
 %%% Created : 26 Jul 2013 by gordonguthrie@backawinner.gg
 
--module(web_page).
+-module(web_page_handler).
 
 -behaviour(cowboy_http_handler).
 
 -include("registry.hrl").
 -include_lib("laredo/include/laredo.hrl").
 
--define(HEAD, "Management Console").
+-define(HEAD,  "Management Console").
 -define(STRAP, "for an (Erlang) WTD EPMD/Proxy").
 
 -export([
@@ -32,14 +32,13 @@ handle(Req, State) ->
     end.
 
 handle_get(Req, State) ->
-
     Header = laredo_bootstrap3:hero(?HEAD, ?STRAP),
     Hdr    = #webpanel{content = Header},
     Panel  = #webpanel{content = list_available()},
     Body   = #webbody{mainbody = Panel,
                       header   = Hdr},
     Page   = #webpage{template = laredo_epmd,
-                      webbody = Body},
+                      webbody  = Body},
     HTML   = laredo_api:render_page(Page),
     {ok, Req2} = cowboy_req:reply(200, [], HTML, Req),
     {ok, Req2, State}.
@@ -55,24 +54,18 @@ terminate(_Reason, _Req, _State) ->
 %%%
 
 list_available() ->
-    List = registry:list_availableDB(),
+    List = registry:list_entriesDB(),
     Header = html:tr([
-                 html:th("Name"),
-                 html:th("Verified"),
-                 html:th("Available"),
                  html:th("Public"),
-                 html:th("Private")
+                 html:th("Private"),
+                 html:th("Verified")
                 ]),
     TabBody = [html:tr([
-                   html:td(N),
-                   html:td(atom_to_list(V)),
-                   html:td(atom_to_list(A)),
                    html:td(PubK),
-                   html:td(PrivK)
+                   html:td(PrivK),
+                   html:td(atom_to_list(V))
                   ])
-               || #registry{name         = N,
-                            verified     = V,
-                            is_available = A,
+               || #registry{verified     = V,
                             public_key   = PubK,
                             private_key  = PrivK} <- List],
     Content = lists:flatten([Header, TabBody]),

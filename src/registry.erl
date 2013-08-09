@@ -9,26 +9,23 @@
 -module(registry).
 
 -export([
-         add_node/2,
-         add_nodeDB/3,
+         add_node/1,
+         add_nodeDB/2,
          verifyDB/1,
-         set_availabilityDB/2,
-         list_availableDB/0
+         list_entriesDB/0
          ]).
 
 -include("registry.hrl").
 
-add_node(Name, PublicKey) when is_list(Name) andalso is_list(PublicKey) ->
+add_node(PublicKey) when is_list(PublicKey) ->
     PrivateKey = mochihex:to_hex(binary_to_list(crypto:strong_rand_bytes(16))),
-    ok = add_nodeDB(Name, PublicKey, PrivateKey),
+    ok = add_nodeDB(PublicKey, PrivateKey),
     {ok, PrivateKey}.
 
-add_nodeDB(Name, PublicKey, PrivateKey) when is_list(Name)       andalso
-                                             is_list(PublicKey)  andalso
-                                             is_list(PrivateKey) ->
+add_nodeDB(PublicKey, PrivateKey) when is_list(PublicKey)  andalso
+                                       is_list(PrivateKey) ->
     Table = registry,
-    Record = #registry{name = Name,
-                       public_key = PublicKey,
+    Record = #registry{public_key = PublicKey,
                        private_key = PrivateKey},
     WriteFn = fun() ->
                        ok = mnesia:write(Table, Record, write)
@@ -49,27 +46,10 @@ verifyDB(PublicKey) when is_list(PublicKey) ->
         end,
     mnesia:activity(transaction, UpdateFn).
 
-set_availabilityDB(Name, Availability) when is_list(Name)            andalso
-                                            is_boolean(Availability) ->
-    Table = registry,
-    UpdateFn =
-        fun() ->
-                case mnesia:read(Table, Name, write) of
-                    [#registry{verified = true} = R] ->
-                        NewR = R#registry{is_available = Availability},
-                        mnesia:write(Table, NewR, write);
-                    [#registry{verified = false}] ->
-                        {error, not_verified};
-                    [] ->
-                        {error, not_found}
-                end
-        end,
-    mnesia:activity(transaction, UpdateFn).
-
-list_availableDB() ->
+list_entriesDB() ->
     Table = registry,
     FilterFn = fun() ->
-                       Spec = #registry{_='_', is_available = true},
+                       Spec = #registry{_='_'},
                        mnesia:match_object(Table, Spec, read)
                end,
     mnesia:activity(transaction, FilterFn).

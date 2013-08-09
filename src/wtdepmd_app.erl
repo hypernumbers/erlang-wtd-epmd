@@ -56,7 +56,7 @@ start_web_gui(DebugOn) ->
     D = [
          {?ALLHOSTS, [
                       AssetDirective,
-                      {?ALLPATHS, web_page, []}]}
+                      {?ALLPATHS, web_page_handler, []}]}
         ],
 
 
@@ -78,7 +78,7 @@ start_proxy(DebugOn) ->
     D = [
          {?ALLHOSTS, [
                       AssetDirective,
-                      {?ALLPATHS, wtd_proxy, []}]}
+                      {?ALLPATHS, wtd_proxy_handler, []}]}
         ],
 
     CDispatch = cowboy_router:compile(D),
@@ -98,7 +98,7 @@ start_epmd(DebugOn) ->
     D = [
          {?ALLHOSTS, [
                       AssetDirective,
-                      {?ALLPATHS, epmd, []}]}
+                      {?ALLPATHS, epmd_handler, []}]}
         ],
 
     CDispatch = cowboy_router:compile(D),
@@ -144,8 +144,7 @@ maybe_create_table(DebugOn) ->
               {attributes,       record_info(fields, registry)},
               {disc_only_copies, [node()]},
               {type,             set},
-              {local_content,    true},
-              {index,            [public_key]}
+              {local_content,    true}
              ],
     case mnesia:create_table(Name, TblDef) of
         {atomic, ok} ->

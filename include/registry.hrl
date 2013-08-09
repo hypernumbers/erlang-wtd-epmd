@@ -7,9 +7,7 @@
 
 -record(registry,
         {
-          name,
-          verified,
-          is_available,
           public_key,
-          private_key
+          private_key,
+          verified    = false
         }).
