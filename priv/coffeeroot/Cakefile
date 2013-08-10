@@ -49,11 +49,9 @@ task 'bake', 'Build single application file from source files', ->
       exec 'coffee --compile -m ../../var/docroot/_assets/laredo/js/laredo.coffee', (err, stdout, stderr) ->
         if err
           util.log 'Error compiling coffee file.'
+          util.log stderr
           grrrr 'Uh, your coffee is bad.'
         else
-          fs.unlink '../../var/docroot/_assets/laredo/js/laredo.coffee', (err) ->
-            if err
-              util.log 'Couldn\'t delete the laredo.coffee file/'
             util.log 'Done building coffee file.'
             grrrr 'Okay, coffee is ready.'
   "ok"
