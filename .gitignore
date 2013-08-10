@@ -8,3 +8,4 @@ logs/
 *.beam
 *.plt
 *~
+erl_crash.dump
