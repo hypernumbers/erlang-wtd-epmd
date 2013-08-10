@@ -14,7 +14,7 @@ main([]) ->
     Cmd = "run_erl -daemon " ++ PipeDir ++ " var/runerl_log " ++
     "\"erl -name " ++ Node ++ " -smp "  ++
         "-pa ./ebin -pa ./deps/*/ebin " ++
-        "-s wtdepmd_app " ++
+        "-s start " ++
         "-config var/sys\"",
 
     case os:cmd(Cmd) of

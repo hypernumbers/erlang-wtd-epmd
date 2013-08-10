@@ -29,7 +29,9 @@ start_link() ->
 %% Supervisor callbacks
 %% ===================================================================
 
-
 init([]) ->
-    {ok, { {one_for_one, 5, 10}, []} }.
+
+    EPMD = ?CHILD(epmd_srv, worker),
+
+    {ok, { {one_for_one, 5, 10}, [EPMD]} }.
 

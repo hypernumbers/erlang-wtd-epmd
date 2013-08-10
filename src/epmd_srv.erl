@@ -17,7 +17,8 @@
 
 %% General API
 -export([
-         get_servers/0
+         get_servers/0,
+         got_ping/1
         ]).
 
 %% gen_server callbacks
@@ -64,6 +65,9 @@ init([]) ->
 get_servers() ->
     gen_server:call(?MODULE, get_servers).
 
+got_ping(PublicKey) ->
+    gen_server:cast(?MODULE, {ping, PublicKey}).
+
 %%--------------------------------------------------------------------
 %%
 %% Call Handling
@@ -73,7 +77,11 @@ handle_call(get_servers, _From, #state{servers = Servers} = State) ->
     Reply = {servers, Servers},
     {reply, Reply, State}.
 
+handle_cast({ping, PublicKey}, #state{servers = Servers} = State) ->
+    io:format("State is ~p~nPublicKey is ~p~n", [State, PublicKey]),
+    {noreply, State};
 handle_cast(_Msg, State) ->
+    io:format("not handling message...~n"),
     {noreply, State}.
 
 handle_info(_Info, State) ->

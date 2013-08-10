@@ -25,8 +25,9 @@
 %% Application callbacks
 %% ===================================================================
 start() ->
-    application:start(wtdepmd),
-    application:start(mnesia),
+    ok.
+
+start(_StartType, _StartArgs) ->
     DebugOn = case application:get_env(wtdepmd, startup_debug) of
                   {ok, true} -> true;
                   _          -> false
@@ -34,12 +35,7 @@ start() ->
     ok = start_mnesia(DebugOn),
     ok = start_web_gui(DebugOn),
     ok = start_proxy(DebugOn),
-    ok = start_epmd(DebugOn).
-
-start(_StartType, _StartArgs) ->
-    ok = application:start(crypto),
-    ok = application:start(ranch),
-    ok = application:start(cowboy),
+    ok = start_epmd(DebugOn),
     wtdepmd_sup:start_link().
 
 stop(_State) ->

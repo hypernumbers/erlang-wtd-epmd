@@ -1,11 +1,9 @@
 # create a master object on the window and hang this class on it
 root = exports ? this
+root.LAREDO = {}
 
 # make jQuery a local alias
 $ = jQuery
-
-class LaredoObject
-      @laredo: {}
 
 class LaredoPost
 
@@ -19,15 +17,10 @@ class LaredoPost
 
       # define the api which we will return
       # this is the last statement so it is returned automatically
-      api:
-           bind: ->
+      bind: ->
             $('.laredo-submit').click(click)
-
-
-unless root.LAREDO
-       root.LAREDO = new LaredoObject
 
 L = root.LAREDO
 
 L.post = new LaredoPost
-L.post.api.bind()
+L.post.bind()
