@@ -18,7 +18,7 @@
 %% General API
 -export([
          get_servers/0,
-         got_ping/1
+         got_ping/2
         ]).
 
 %% gen_server callbacks
@@ -33,15 +33,9 @@
 
 -define(SERVER, ?MODULE).
 
--record(server,
-        {
-          name,
-          is_available = true
-        }).
-
 -record(state, {
           keys    = [],
-          servers = []
+          servers = dict:new()
          }).
 
 %%--------------------------------------------------------------------
@@ -65,8 +59,8 @@ init([]) ->
 get_servers() ->
     gen_server:call(?MODULE, get_servers).
 
-got_ping(PublicKey) ->
-    gen_server:cast(?MODULE, {ping, PublicKey}).
+got_ping({PublicKey, Name}, Vals) ->
+    gen_server:cast(?MODULE, {ping, {{PublicKey, Name}, Vals}}).
 
 %%--------------------------------------------------------------------
 %%
@@ -74,15 +68,13 @@ got_ping(PublicKey) ->
 %%
 %%--------------------------------------------------------------------
 handle_call(get_servers, _From, #state{servers = Servers} = State) ->
-    Reply = {servers, Servers},
+    Reply = {servers, dict:to_list(Servers)},
     {reply, Reply, State}.
 
-handle_cast({ping, PublicKey}, #state{servers = Servers} = State) ->
-    io:format("State is ~p~nPublicKey is ~p~n", [State, PublicKey]),
-    {noreply, State};
-handle_cast(_Msg, State) ->
-    io:format("not handling message...~n"),
-    {noreply, State}.
+handle_cast({ping, {{_PublicKey, _Name} = S, Vals}}, State) ->
+    #state{servers = Svs} = State,
+    NewServers = dict:store(S, Vals, Svs),
+    {noreply, State#state{servers = NewServers}}.
 
 handle_info(_Info, State) ->
     {noreply, State}.

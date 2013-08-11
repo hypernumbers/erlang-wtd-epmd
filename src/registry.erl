@@ -1,7 +1,7 @@
 %%% @author    Gordon Guthrie
 %%% @copyright (C) 2013, Gordon Guthrie
 %%% @doc       Holds the registry of available and verified
-%%%            Eralng WTD nodes
+%%%            Erlang WTD nodes
 %%%
 %%% @end
 %%% Created :  6 Aug 2013 by gordonguthrie@backawinner.gg
@@ -9,6 +9,7 @@
 -module(registry).
 
 -export([
+         lookup/1,
          add_node/1,
          add_nodeDB/2,
          verifyDB/1,
@@ -16,6 +17,16 @@
          ]).
 
 -include("registry.hrl").
+
+lookup(PublicKey) when is_list(PublicKey) ->
+    Table = registry,
+    ReadFn = fun() ->
+                     case mnesia:read(Table, PublicKey, read) of
+                         []  -> {error, no_key};
+                         [R] -> {ok, R}
+                     end
+             end,
+    mnesia:activity(transaction, ReadFn).
 
 add_node(PublicKey) when is_list(PublicKey) ->
     PrivateKey = mochihex:to_hex(binary_to_list(crypto:strong_rand_bytes(16))),
@@ -36,7 +47,7 @@ verifyDB(PublicKey) when is_list(PublicKey) ->
     Table = registry,
     UpdateFn =
         fun() ->
-                case mnesia:index_read(Table, PublicKey, public_key) of
+                case mnesia:read(Table, PublicKey, write) of
                     [#registry{} = R] ->
                         NewR = R#registry{verified = true},
                         mnesia:write(Table, NewR, write);

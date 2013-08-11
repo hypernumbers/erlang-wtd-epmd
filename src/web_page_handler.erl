@@ -32,9 +32,15 @@ handle(Req, State) ->
     end.
 
 handle_get(Req, State) ->
+
+    Content = html:h3("Connected Nodes") ++
+        list_connected() ++
+        html:h3("Available Nodes") ++
+        list_available(),
+
     Header = laredo_bootstrap3:hero(?HEAD, ?STRAP),
     Hdr    = #webpanel{content = Header},
-    Panel  = #webpanel{content = list_available()},
+    Panel  = #webpanel{content = Content},
     Body   = #webbody{mainbody = Panel,
                       header   = Hdr},
     Page   = #webpage{template = laredo_epmd,
@@ -68,6 +74,19 @@ list_available() ->
                || #registry{verified     = V,
                             public_key   = PubK,
                             private_key  = PrivK} <- List],
+    Content = lists:flatten([Header, TabBody]),
+    _HTML = html:table(Content, [], "table table-striped").
+
+list_connected() ->
+    {servers, List} = epmd_srv:get_servers(),
+    Header = html:tr([
+                 html:th("Server"),
+                 html:th("Vals")
+                ]),
+    TabBody = [html:tr([
+                        html:td("{" ++ PubK ++ ", " ++ Name ++ "}"),
+                        html:td(Vals)
+                  ]) ||  {{PubK, Name}, Vals} <- List],
     Content = lists:flatten([Header, TabBody]),
     _HTML = html:table(Content, [], "table table-striped").
 
