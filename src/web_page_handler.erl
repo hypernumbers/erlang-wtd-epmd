@@ -81,12 +81,12 @@ list_connected() ->
     {servers, List} = epmd_srv:get_servers(),
     Header = html:tr([
                  html:th("Server"),
-                 html:th("Vals")
+                 html:th("Missions")
                 ]),
     TabBody = [html:tr([
                         html:td("{" ++ PubK ++ ", " ++ Name ++ "}"),
-                        html:td(Vals)
-                  ]) ||  {{PubK, Name}, Vals} <- List],
+                        html:td(io_lib:format("~s", [Missions]))
+                  ]) ||  {{PubK, Name}, Missions} <- List],
     Content = lists:flatten([Header, TabBody]),
     _HTML = html:table(Content, [], "table table-striped").
 

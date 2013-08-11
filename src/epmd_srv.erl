@@ -59,8 +59,8 @@ init([]) ->
 get_servers() ->
     gen_server:call(?MODULE, get_servers).
 
-got_ping({PublicKey, Name}, Vals) ->
-    gen_server:cast(?MODULE, {ping, {{PublicKey, Name}, Vals}}).
+got_ping({PublicKey, Name}, Missions) ->
+    gen_server:cast(?MODULE, {ping, {{PublicKey, Name}, Missions}}).
 
 %%--------------------------------------------------------------------
 %%
@@ -71,9 +71,9 @@ handle_call(get_servers, _From, #state{servers = Servers} = State) ->
     Reply = {servers, dict:to_list(Servers)},
     {reply, Reply, State}.
 
-handle_cast({ping, {{_PublicKey, _Name} = S, Vals}}, State) ->
+handle_cast({ping, {{_PublicKey, _Name} = S, Missions}}, State) ->
     #state{servers = Svs} = State,
-    NewServers = dict:store(S, Vals, Svs),
+    NewServers = dict:store(S, Missions, Svs),
     {noreply, State#state{servers = NewServers}}.
 
 handle_info(_Info, State) ->
