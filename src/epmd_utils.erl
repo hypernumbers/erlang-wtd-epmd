@@ -11,8 +11,12 @@
          recursive_copy/2,
          get_www_root/0,
          get_public_key/1,
-         to_s/1
+         to_s/1,
+         timestamp/0
         ]).
+
+-define(MEGA, 1000000000000).
+-define(SEC,  1000000).
 
 %% Recursively copy directories
 -spec recursive_copy(list(), list()) -> ok.
@@ -75,3 +79,7 @@ to_s(Flt) when is_float(Flt)        ->
         true  -> integer_to_list(erlang:trunc(Flt));
         false -> string:to_upper(mochinum:digits(Flt))
     end.
+
+timestamp() ->
+    {Mega, Sec, Micro} = now(),
+    ?MEGA * Mega + ?SEC * Sec + Micro.

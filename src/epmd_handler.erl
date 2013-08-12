@@ -70,10 +70,9 @@ handle_p3(PublicKey, PrivateKey, Hdrs, Req, State) ->
     IsAuth = hmac_api_lib:cowboy_authorize_request(Req, PublicKey, PrivateKey),
     case IsAuth of
         "match" ->
-            Resp = {ok, authenticated},
             {ok, Binary, _} = cowboy_req:body(Req),
             {Name, Missions} = bert:decode(base64:decode(Binary)),
-            ok = epmd_srv:got_ping(Name, Missions),
+            Resp = {ok, epmd_srv:got_ping(Name, Missions)},
             http_utils:'200'(Resp, Hdrs, Req, State);
         "nomatch" ->
             Resp = {error, denied},

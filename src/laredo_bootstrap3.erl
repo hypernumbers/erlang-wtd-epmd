@@ -63,9 +63,6 @@
                a/5
               ]).
 
--define(MEGA, 1000000000000).
--define(SEC,  1000000).
-
 %%%-----------------------------------------------------------------------------
 %%%
 %%% API Fns
@@ -123,8 +120,4 @@ print_r(Rec, Fields) ->
 %%%-----------------------------------------------------------------------------
 
 get_id(Prefix) when is_list(Prefix) ->
-    Prefix ++ integer_to_list(timestamp()).
-
-timestamp() ->
-    {Mega, Sec, Micro} = now(),
-    ?MEGA * Mega + ?SEC * Sec + Micro.
+    Prefix ++ integer_to_list(epmd_utils:timestamp()).

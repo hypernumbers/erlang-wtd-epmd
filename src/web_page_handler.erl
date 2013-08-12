@@ -94,7 +94,7 @@ list_connected() ->
                  html:th("Server"),
                  html:th("Missions")
                 ]),
-    TabBody = [MakeBodyFn(Name, Rs) ||  {Name, Rs} <- List],
+    TabBody = [MakeBodyFn(Name, Rs) ||  {Name, {Rs, _}} <- List],
     Content = lists:flatten([Header, TabBody]),
     _HTML = html:table(Content, [], "table table-striped").
 
