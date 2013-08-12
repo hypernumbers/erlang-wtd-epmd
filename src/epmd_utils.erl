@@ -10,7 +10,8 @@
 -export([
          recursive_copy/2,
          get_www_root/0,
-         get_public_key/1
+         get_public_key/1,
+         to_s/1
         ]).
 
 %% Recursively copy directories
@@ -62,4 +63,15 @@ get_header(Headers, Type) ->
     case lists:keyfind(Type, 1, Headers) of
         false   -> [];
         {_K, V} -> V
+    end.
+
+to_s(Int) when is_integer(Int)      -> integer_to_list(Int);
+to_s(Str) when is_list(Str)         -> Str;
+to_s(A)   when is_atom(A)           -> atom_to_list(A);
+to_s(T)   when is_tuple(T)          -> lists:flatten(io_lib:format("~p", [T]));
+to_s(Flt) when is_float(Flt)        ->
+    %% definetaly a better way to test this (3.0 = "3")
+    case erlang:trunc(Flt) == Flt andalso Flt < 99999 of
+        true  -> integer_to_list(erlang:trunc(Flt));
+        false -> string:to_upper(mochinum:digits(Flt))
     end.

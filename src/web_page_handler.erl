@@ -10,6 +10,7 @@
 -behaviour(cowboy_http_handler).
 
 -include("registry.hrl").
+-include("epmd_srv.hrl").
 -include_lib("laredo/include/laredo.hrl").
 
 -define(HEAD,  "Management Console").
@@ -78,15 +79,25 @@ list_available() ->
     _HTML = html:table(Content, [], "table table-striped").
 
 list_connected() ->
+    MakeBodyFn
+        = fun(Name1, Name2, Records) ->
+                  Name = "{" ++ epmd_utils:to_s(Name1) ++
+                      ", " ++ epmd_utils:to_s(Name2) ++
+                      "}",
+                  Recs = [laredo_bootstrap3:record(X) || X <- Records],
+
+                  [html:tr([
+                            html:td(Name),
+                            html:td(Recs)
+                           ])]
+          end,
     {servers, List} = epmd_srv:get_servers(),
     Header = html:tr([
                  html:th("Server"),
                  html:th("Missions")
                 ]),
-    TabBody = [html:tr([
-                        html:td("{" ++ PubK ++ ", " ++ Name ++ "}"),
-                        html:td(io_lib:format("~s", [Missions]))
-                  ]) ||  {{PubK, Name}, Missions} <- List],
+    TabBody = [MakeBodyFn(Name1, Name2, Rs)
+               ||  {{_S , {[{_, Name1}, {_,Name2}]}}, Rs} <- List],
     Content = lists:flatten([Header, TabBody]),
     _HTML = html:table(Content, [], "table table-striped").
 

@@ -73,9 +73,8 @@ handle_p3(PublicKey, PrivateKey, Hdrs, Req, State) ->
             Resp = {[{ok, authenticated}]},
             {ok, Binary, _} = cowboy_req:body(Req),
             {Body2} = jiffy:decode(Binary),
-            io:format("Body2 is ~p~n", [Body2]),
             {_, Name} = lists:keyfind(<<"name">>, 1, Body2),
-            {_, Vals} = lists:keyfind(<<"vals">>, 1, Body2),
+            {_, Vals} = lists:keyfind(<<"missions">>, 1, Body2),
             ok = epmd_srv:got_ping({PublicKey, Name}, Vals),
             http_utils:'200'(Resp, Hdrs, Req, State);
         "nomatch" ->

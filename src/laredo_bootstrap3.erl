@@ -7,15 +7,17 @@
 
 -module(laredo_bootstrap3).
 
+-include("epmd_srv.hrl").
+
 -export([
          well/1,
          hero/1,
          hero/2,
          form_field/3,
          form_checkbox/1,
-         form/3
+         form/3,
+         record/1
          %% table_from_lists/1,
-         %% record/1
         ]).
 
 -import(html, [
@@ -64,6 +66,15 @@
 -define(MEGA, 1000000000000).
 -define(SEC,  1000000).
 
+%%%-----------------------------------------------------------------------------
+%%%
+%%% API Fns
+%%%
+%%%-----------------------------------------------------------------------------
+
+well(HTML) ->
+    "<div class='well'>" ++ lists:flatten(HTML) ++ "</div>".
+
 hero(Headline) ->
     hero(Headline, []).
 
@@ -94,8 +105,22 @@ form(Legend, Fields, ButtonTxt) ->
         "</fieldset>" ++
         "</form>".
 
-well(HTML) ->
-    "<div class='well'>" ++ lists:flatten(HTML) ++ "</div>".
+record(Rec) when is_record(Rec, mission) ->
+    Fields = record_info(fields, mission),
+    print_r(Rec, Fields).
+
+print_r(Rec, Fields) ->
+    List = lists:zip(Fields, tl(tuple_to_list(Rec))),
+    HTML = [["<dt>", epmd_utils:to_s(K), "</dt><dd>",
+             epmd_utils:to_s(V), "</dd>"]
+            || {K, V} <- List],
+    lists:flatten(["<dl>", HTML, "</dl>"]).
+
+%%%-----------------------------------------------------------------------------
+%%%
+%%% Intern Fns
+%%%
+%%%-----------------------------------------------------------------------------
 
 get_id(Prefix) when is_list(Prefix) ->
     Prefix ++ integer_to_list(timestamp()).

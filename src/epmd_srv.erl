@@ -1,7 +1,7 @@
 %%%-------------------------------------------------------------------
 %%% @author    Gordon Guthrie
 %%% @copyright (C) 2013, Gordon Guthrie
-%%% @doc
+%%% @doc       this server supports the epmd service
 %%%
 %%% @end
 %%% Created :  8 Aug 2013 by gordon@vixo.com
@@ -20,6 +20,8 @@
          get_servers/0,
          got_ping/2
         ]).
+
+-include("epmd_srv.hrl").
 
 %% gen_server callbacks
 -export([
@@ -73,7 +75,9 @@ handle_call(get_servers, _From, #state{servers = Servers} = State) ->
 
 handle_cast({ping, {{_PublicKey, _Name} = S, Missions}}, State) ->
     #state{servers = Svs} = State,
-    NewServers = dict:store(S, Missions, Svs),
+    {List} = Missions,
+    NewM = [transform(X) || X <- List],
+    NewServers = dict:store(S, NewM, Svs),
     {noreply, State#state{servers = NewServers}}.
 
 handle_info(_Info, State) ->
@@ -88,3 +92,14 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
+transform(Mission) ->
+    {_, {[
+          {_, Name},
+          {_, {[
+                {_, PK1},
+                {_, PK2}
+               ]}
+          }
+         ]}
+    } = Mission,
+    #mission{name = Name, public_key = {PK1, PK2}}.
