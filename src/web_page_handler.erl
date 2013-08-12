@@ -80,14 +80,12 @@ list_available() ->
 
 list_connected() ->
     MakeBodyFn
-        = fun(Name1, Name2, Records) ->
-                  Name = "{" ++ epmd_utils:to_s(Name1) ++
-                      ", " ++ epmd_utils:to_s(Name2) ++
-                      "}",
+        = fun(Name, Records) ->
+                  Nm   = epmd_utils:to_s(Name),
                   Recs = [laredo_bootstrap3:record(X) || X <- Records],
 
                   [html:tr([
-                            html:td(Name),
+                            html:td(Nm),
                             html:td(Recs)
                            ])]
           end,
@@ -96,8 +94,7 @@ list_connected() ->
                  html:th("Server"),
                  html:th("Missions")
                 ]),
-    TabBody = [MakeBodyFn(Name1, Name2, Rs)
-               ||  {{_S , {[{_, Name1}, {_,Name2}]}}, Rs} <- List],
+    TabBody = [MakeBodyFn(Name, Rs) ||  {Name, Rs} <- List],
     Content = lists:flatten([Header, TabBody]),
     _HTML = html:table(Content, [], "table table-striped").
 

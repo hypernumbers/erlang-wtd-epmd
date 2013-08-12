@@ -75,9 +75,7 @@ handle_call(get_servers, _From, #state{servers = Servers} = State) ->
 
 handle_cast({ping, {{_PublicKey, _Name} = S, Missions}}, State) ->
     #state{servers = Svs} = State,
-    {List} = Missions,
-    NewM = [transform(X) || X <- List],
-    NewServers = dict:store(S, NewM, Svs),
+    NewServers = dict:store(S, Missions, Svs),
     {noreply, State#state{servers = NewServers}}.
 
 handle_info(_Info, State) ->
@@ -92,14 +90,3 @@ code_change(_OldVsn, State, _Extra) ->
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
-transform(Mission) ->
-    {_, {[
-          {_, Name},
-          {_, {[
-                {_, PK1},
-                {_, PK2}
-               ]}
-          }
-         ]}
-    } = Mission,
-    #mission{name = Name, public_key = {PK1, PK2}}.

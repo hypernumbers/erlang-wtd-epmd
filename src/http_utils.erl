@@ -8,7 +8,7 @@
 -module(http_utils).
 
 -export([
-         matches_json/1,
+         matches_bert/1,
          '404'/5,
          '403'/4,
          '200'/4
@@ -16,13 +16,13 @@
 
 -include_lib("laredo/include/laredo.hrl").
 
-matches_json(undefined)           -> false;
-matches_json(B) when is_binary(B) -> B2 = binary:split(B, <<";">>),
-                                     matches_j2(B2).
+matches_bert(undefined)           -> false;
+matches_bert(B) when is_binary(B) -> B2 = binary:split(B, <<";">>),
+                                     matches_b2(B2).
 
-matches_j2([])                            -> false;
-matches_j2([<<"application/json">> | _T]) -> true;
-matches_j2([_H                     | T])  -> matches_j2(T).
+matches_b2([])                            -> false;
+matches_b2([<<"application/json">> | _T]) -> true;
+matches_b2([_H                     | T])  -> matches_b2(T).
 
 '404'(Head, Strap, Headers, Req, State) ->
     Header = laredo_bootstrap3:hero(Head, Strap),
@@ -37,11 +37,11 @@ matches_j2([_H                     | T])  -> matches_j2(T).
     {ok, Req2, State}.
 
 '403'(Response, Headers, Req, State) ->
-    Resp = jiffy:encode(Response),
+    Resp = base64:encode(bert:encode(Response)),
     {ok, Req2} = cowboy_req:reply(403, Headers, Resp, Req),
     {ok, Req2, State}.
 
 '200'(Response, Headers, Req, State) ->
-    Resp = jiffy:encode(Response),
+    Resp = base64:encode(bert:encode(Response)),
     {ok, Req2} = cowboy_req:reply(200, Headers, Resp, Req),
     {ok, Req2, State}.

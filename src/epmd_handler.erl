@@ -45,9 +45,9 @@ handle_p(Req, State) ->
     {ContentType, _} = cowboy_req:header(<<"content-type">>, Req),
     {Accept, _}      = cowboy_req:header(<<"accept">>, Req),
     Hdrs = [{<<"content-type">>, ContentType}],
-    JSONIn  = http_utils:matches_json(ContentType),
-    JSONOut = http_utils:matches_json(Accept),
-    case {JSONIn, JSONOut} of
+    BERTIn  = http_utils:matches_bert(ContentType),
+    BERTOut = http_utils:matches_bert(Accept),
+    case {BERTIn, BERTOut} of
         {true, true} -> handle_p2(Hdrs, Req, State);
         {_,    _}    -> http_utils:'404'(?HEAD, ?STRAP, Hdrs, Req, State)
 
@@ -57,10 +57,10 @@ handle_p2(Hdrs, Req, State) ->
     PublicKey = epmd_utils:get_public_key(Req),
     case registry:lookup(PublicKey) of
         {error, no_key} ->
-            Resp = {[{error, not_registered}]},
+            Resp = {error, not_registered},
             http_utils:'403'(Resp, Hdrs, Req, State);
         {ok, #registry{verified = false}} ->
-            Resp = {[{error, not_verified}]},
+            Resp = {error, not_verified},
             http_utils:'403'(Resp, Hdrs, Req, State);
         {ok, #registry{private_key = PrivateKey, verified = true}} ->
             handle_p3(PublicKey, PrivateKey, Hdrs, Req, State)
@@ -70,15 +70,13 @@ handle_p3(PublicKey, PrivateKey, Hdrs, Req, State) ->
     IsAuth = hmac_api_lib:cowboy_authorize_request(Req, PublicKey, PrivateKey),
     case IsAuth of
         "match" ->
-            Resp = {[{ok, authenticated}]},
+            Resp = {ok, authenticated},
             {ok, Binary, _} = cowboy_req:body(Req),
-            {Body2} = jiffy:decode(Binary),
-            {_, Name} = lists:keyfind(<<"name">>, 1, Body2),
-            {_, Vals} = lists:keyfind(<<"missions">>, 1, Body2),
-            ok = epmd_srv:got_ping({PublicKey, Name}, Vals),
+            {Name, Missions} = bert:decode(base64:decode(Binary)),
+            ok = epmd_srv:got_ping(Name, Missions),
             http_utils:'200'(Resp, Hdrs, Req, State);
         "nomatch" ->
-            Resp = {[{error, denied}]},
+            Resp = {error, denied},
             http_utils:'403'(Resp, Hdrs, Req, State)
     end.
 
