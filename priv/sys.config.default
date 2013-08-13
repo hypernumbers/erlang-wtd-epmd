@@ -7,8 +7,7 @@
    {startup_debug, true},
 
    {web_page_port,  14151},
-   {wtd_epmd_port,  14152},
-   {wtd_proxy_port, 14153}
+   {wtd_epmd_port,  14152}
   ]},
  {mnesia,
   [

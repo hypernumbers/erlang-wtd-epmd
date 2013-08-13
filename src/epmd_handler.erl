@@ -35,13 +35,6 @@ handle_get(Req, State) ->
     http_utils:'404'(?HEAD, ?STRAP, Req, State).
 
 handle_post(Req, State) ->
-    {Path, _}    = cowboy_req:path(Req),
-    case Path of
-        <<"/">> -> handle_p(Req, State);
-        _       -> http_utils:'404'(?HEAD, ?STRAP, Req, State)
-    end.
-
-handle_p(Req, State) ->
     {ContentType, _} = cowboy_req:header(<<"content-type">>, Req),
     {Accept, _}      = cowboy_req:header(<<"accept">>, Req),
     Hdrs = [{<<"content-type">>, ContentType}],
@@ -67,6 +60,13 @@ handle_p2(Hdrs, Req, State) ->
     end.
 
 handle_p3(PublicKey, PrivateKey, Hdrs, Req, State) ->
+    {Path, _}    = cowboy_req:path(Req),
+    case Path of
+        <<"/">> -> handle_epmd(PublicKey, PrivateKey, Hdrs,  Req, State);
+        _       -> handle_proxy(Path, PublicKey, PrivateKey, Hdrs, Req, State)
+    end.
+
+handle_epmd(PublicKey, PrivateKey, Hdrs, Req, State) ->
     IsAuth = hmac_api_lib:cowboy_authorize_request(Req, PublicKey, PrivateKey),
     case IsAuth of
         "match" ->
@@ -78,6 +78,10 @@ handle_p3(PublicKey, PrivateKey, Hdrs, Req, State) ->
             Resp = {error, denied},
             http_utils:'403'(Resp, Hdrs, Req, State)
     end.
+
+handle_proxy(Path, PublicKey, PrivateKey, Hdrs, Req, State) ->
+    io:format("Path is ~p~n", [Path]),
+    http_utils:'200'(yongle, Hdrs, Req, State).
 
 terminate(_Reason, _Req, _State) ->
     ok.

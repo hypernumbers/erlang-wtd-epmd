@@ -1,4 +1,6 @@
 -record(mission, {
           name,
-          public_key
+          public_key,
+          exports    = [],
+          behaviours = []
          }).

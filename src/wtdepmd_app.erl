@@ -34,7 +34,6 @@ start(_StartType, _StartArgs) ->
               end,
     ok = start_mnesia(DebugOn),
     ok = start_web_gui(DebugOn),
-    ok = start_proxy(DebugOn),
     ok = start_epmd(DebugOn),
     wtdepmd_sup:start_link().
 
@@ -60,26 +59,6 @@ start_web_gui(DebugOn) ->
 
     {ok, _PID} = cowboy:start_http(web_page_listener, 100,
                                    [{port, WebPort}],
-                                   [{env, [{dispatch, CDispatch}]}]),
-    ok.
-
-start_proxy(DebugOn) ->
-
-    msg(DebugOn, "WTD EPMD Debug: starting proxy~n"),
-
-    {ok, ProxyPort} = application:get_env(wtdepmd, wtd_proxy_port),
-
-    AssetDirective = get_asset_directive(),
-
-    D = [
-         {?ALLHOSTS, [
-                      AssetDirective,
-                      {?ALLPATHS, wtd_proxy_handler, []}]}
-        ],
-
-    CDispatch = cowboy_router:compile(D),
-    {ok, _PID} = cowboy:start_http(proxy_listener, 100,
-                                   [{port, ProxyPort}],
                                    [{env, [{dispatch, CDispatch}]}]),
     ok.
 
