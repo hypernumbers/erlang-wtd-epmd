@@ -50,10 +50,10 @@ handle_p2(Hdrs, Req, State) ->
     PublicKey = epmd_utils:get_public_key(Req),
     case registry:lookup(PublicKey) of
         {error, no_key} ->
-            Resp = {error, not_registered},
+            Resp = {error, "not_registered"},
             http_utils:'403'(Resp, Hdrs, Req, State);
         {ok, #registry{verified = false}} ->
-            Resp = {error, not_verified},
+            Resp = {error, "not_verified"},
             http_utils:'403'(Resp, Hdrs, Req, State);
         {ok, #registry{private_key = PrivateKey, verified = true}} ->
             handle_p3(PublicKey, PrivateKey, Hdrs, Req, State)
@@ -70,12 +70,12 @@ handle_epmd(PublicKey, PrivateKey, Hdrs, Req, State) ->
     IsAuth = hmac_api_lib:cowboy_authorize_request(Req, PublicKey, PrivateKey),
     case IsAuth of
         "match" ->
-            {ok, Binary, _} = cowboy_req:body(Req),
+            {ok, Binary, _}  = cowboy_req:body(Req),
             {Name, Missions} = bert:decode(base64:decode(Binary)),
-            Resp = {ok, epmd_srv:got_ping(Name, Missions)},
+            Resp             = {ok, epmd_srv:got_ping(Name, Missions)},
             http_utils:'200'(Resp, Hdrs, Req, State);
         "nomatch" ->
-            Resp = {error, denied},
+            Resp = {error, "denied"},
             http_utils:'403'(Resp, Hdrs, Req, State)
     end.
 

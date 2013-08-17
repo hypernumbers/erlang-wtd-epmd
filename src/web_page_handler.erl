@@ -82,8 +82,7 @@ list_connected() ->
     MakeBodyFn
         = fun(Name, Records) ->
                   Nm   = epmd_utils:to_s(Name),
-                  Recs = [laredo_bootstrap3:record(X) || X <- Records],
-
+                  Recs = [make_def(X) || X <- Records],
                   [html:tr([
                             html:td(Nm),
                             html:td(Recs)
@@ -97,4 +96,16 @@ list_connected() ->
     TabBody = [MakeBodyFn(Name, Rs) ||  {Name, {Rs, _}} <- List],
     Content = lists:flatten([Header, TabBody]),
     _HTML = html:table(Content, [], "table table-striped").
+
+make_def(#mission{name       = Name,
+                  public_key = PubK,
+                  exports    = Exps,
+                  behaviours = Bhvs}) ->
+    Defs = [
+            {"Name",       Name},
+            {"Public Key", epmd_utils:to_s(PubK)},
+            {"Exports",    [epmd_utils:to_s(X) || X <- Exps]},
+            {"Behaviours", [epmd_utils:to_s(X) || X <- Bhvs]}
+           ],
+    laredo_bootstrap3:definitions(Defs).
 

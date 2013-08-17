@@ -10,13 +10,13 @@
 -include("epmd_srv.hrl").
 
 -export([
+         definitions/1,
          well/1,
          hero/1,
          hero/2,
          form_field/3,
          form_checkbox/1,
-         form/3,
-         record/1
+         form/3
          %% table_from_lists/1,
         ]).
 
@@ -69,6 +69,11 @@
 %%%
 %%%-----------------------------------------------------------------------------
 
+definitions(List) ->
+    [2 = tuple_size(X) || X <- List],
+    lists:flatten(["<dl>", ["<dt>" ++ K ++ "</dt><dd>" ++ V ++ "</dd>"
+                            || {K, V} <- List], "</dl>"]).
+
 well(HTML) ->
     "<div class='well'>" ++ lists:flatten(HTML) ++ "</div>".
 
@@ -101,17 +106,6 @@ form(Legend, Fields, ButtonTxt) ->
         "</button>" ++
         "</fieldset>" ++
         "</form>".
-
-record(Rec) when is_record(Rec, mission) ->
-    Fields = record_info(fields, mission),
-    print_r(Rec, Fields).
-
-print_r(Rec, Fields) ->
-    List = lists:zip(Fields, tl(tuple_to_list(Rec))),
-    HTML = [["<dt>", epmd_utils:to_s(K), "</dt><dd>",
-             epmd_utils:to_s(V), "</dd>"]
-            || {K, V} <- List],
-    lists:flatten(["<dl>", HTML, "</dl>"]).
 
 %%%-----------------------------------------------------------------------------
 %%%
