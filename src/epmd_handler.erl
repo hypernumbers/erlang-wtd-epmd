@@ -59,29 +59,38 @@ handle_p2(Hdrs, Req, State) ->
             handle_p3(PublicKey, PrivateKey, Hdrs, Req, State)
     end.
 
-handle_p3(PublicKey, PrivateKey, Hdrs, Req, State) ->
-    {Path, _}    = cowboy_req:path(Req),
-    case Path of
-        <<"/">> -> handle_epmd(PublicKey, PrivateKey, Hdrs,  Req, State);
-        _       -> handle_proxy(Path, PublicKey, PrivateKey, Hdrs, Req, State)
-    end.
-
-handle_epmd(PublicKey, PrivateKey, Hdrs, Req, State) ->
-    IsAuth = hmac_api_lib:cowboy_authorize_request(Req, PublicKey, PrivateKey),
+handle_p3(PublicK, PrivateK, Hdrs, Req, State) ->
+    {Path, _} = cowboy_req:path(Req),
+    IsAuth    = hmac_api_lib:cowboy_authorize_request(Req, PublicK, PrivateK),
     case IsAuth of
         "match" ->
-            {ok, Binary, _}  = cowboy_req:body(Req),
-            {Name, Missions} = bert:decode(base64:decode(Binary)),
-            Resp             = {ok, epmd_srv:got_ping(Name, Missions)},
-            http_utils:'200'(Resp, Hdrs, Req, State);
+            case Path of
+                <<"/">>    -> handle_epmd(Hdrs, Req, State);
+                <<"/tx/">> -> handle_transmission(Hdrs, Req, State);
+                <<"/rx/">> -> handle_receive(Hdrs, Req, State)
+            end;
         "nomatch" ->
             Resp = {error, "denied"},
             http_utils:'403'(Resp, Hdrs, Req, State)
     end.
 
-handle_proxy(Path, PublicKey, PrivateKey, Hdrs, Req, State) ->
-    io:format("Path is ~p~n", [Path]),
+handle_epmd(Hdrs, Req, State) ->
+            {ok, Binary, _}  = cowboy_req:body(Req),
+            {Name, Missions} = bert:decode(base64:decode(Binary)),
+            Resp             = {ok, epmd_srv:got_ping(Name, Missions)},
+            http_utils:'200'(Resp, Hdrs, Req, State).
+
+handle_transmission(Hdrs, Req, State) ->
+    {ok, Binary, _} = cowboy_req:body(Req),
+    io:format("In transmission Bin is ~p~n",
+              [bert:decode(base64:decode(Binary))]),
     http_utils:'200'(yongle, Hdrs, Req, State).
+
+handle_receive(Hdrs, Req, State) ->
+    {ok, Binary, _} = cowboy_req:body(Req),
+    io:format("In receive Bin is ~p~n", [bert:decode(base64:decode(Binary))]),
+    http_utils:'200'(yongle, Hdrs, Req, State).
+
 
 terminate(_Reason, _Req, _State) ->
     ok.
