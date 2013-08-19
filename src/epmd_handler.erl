@@ -10,6 +10,7 @@
 -behaviour(cowboy_http_handler).
 
 -include("registry.hrl").
+-include("wtd.hrl").
 -include_lib("laredo/include/laredo.hrl").
 
 -define(HEAD,  "EPMD Server").
@@ -82,10 +83,21 @@ handle_epmd(Hdrs, Req, State) ->
 
 handle_transmission(Hdrs, Req, State) ->
     {ok, Binary, _} = cowboy_req:body(Req),
-    Server = bert:decode(base64:decode(Binary)),
-    io:format("In transmission Bin is ~p~n",
-              [Server]),
-    http_utils:'200'(yongle, Hdrs, Req, State).
+    Msg = bert:decode(base64:decode(Binary)),
+    #signed_request{public_key = PubK,
+                    signature  = Sig,
+                    request    = RemoteReq} = Msg,
+    io:format("PubK is ~p~nSig is ~p~nRemoteReq is ~p~n",
+              [PubK, Sig, RemoteReq]),
+    #request{node      = Node,
+             module    = Mod,
+             function  = Fn,
+             arguments = Args,
+             date      = Date} = RemoteReq,
+    io:format("Node is ~p~nMod is ~p~nFn is ~p~nArgs is ~p~nDate is ~p~n",
+              [Node, Mod, Fn, Args, Date]),
+    Reply = cache_srv:tx(Node, Msg),
+    http_utils:'200'(Reply, Hdrs, Req, State).
 
 handle_receive(Hdrs, Req, State) ->
     {ok, Binary, _} = cowboy_req:body(Req),
@@ -93,9 +105,9 @@ handle_receive(Hdrs, Req, State) ->
     Timeout = cache_srv:rx(Server, self()),
     io:format("Timeout is ~p~n", [Timeout]),
     {Status, R} = receive
-                      {tcp_closed, Socket} -> {close, ok};
-                      {error, timeout}     -> {ok, timeout};
-                      {msg, Data}          -> {ok, Data}
+                      {tcp_closed, _Socket} -> {close, ok};
+                      {error, timeout}      -> {ok, timeout};
+                      {msg, Data}           -> {ok, Data}
                   after
                       Timeout -> {ok, {timeout, now()}}
                   end,

@@ -20,7 +20,8 @@
 
 %% General API
 -export([
-         rx/2
+         rx/2,
+         tx/2
         ]).
 
 %% gen_server callbacks
@@ -63,15 +64,26 @@ init([]) ->
 rx(Server, Pid) ->
     gen_server:call(?MODULE, {rx, {Server, Pid}}).
 
+tx(Server, Msg) ->
+    gen_server:call(?MODULE, {tx, {Server, Msg}}).
+
 %%--------------------------------------------------------------------
 %%
 %% Call Handling
 %%
 %%--------------------------------------------------------------------
 handle_call({rx, {Server, Pid}}, _From, #state{servers = Servers} = State) ->
-    io:format("Server is ~p~nPid is ~p~nServers is ~p~n", [Server, Pid, Servers]),
+    NewServers = dict:store(Server, Pid, Servers),
     Reply = ?TIMEOUT,
-    {reply, Reply, State}.
+    {reply, Reply, State#state{servers = NewServers}};
+handle_call({tx, {Server, Data}}, _From, #state{servers = Servers} = State) ->
+    io:format("In tx for ~p~n", [Data]),
+    {Reply, NewS} = case dict:find(Server, Servers) of
+                        error       -> {{error, not_connected}, Servers};
+                        {ok, Value} -> Value ! Data,
+                                       {{ok, ack}, dict:erase(Server, Servers)}
+                    end,
+    {reply, Reply, State#state{servers = NewS}}.
 
 handle_cast(_Msg, State) ->
     {noreply, State}.
