@@ -82,15 +82,27 @@ handle_epmd(Hdrs, Req, State) ->
 
 handle_transmission(Hdrs, Req, State) ->
     {ok, Binary, _} = cowboy_req:body(Req),
+    Server = bert:decode(base64:decode(Binary)),
     io:format("In transmission Bin is ~p~n",
-              [bert:decode(base64:decode(Binary))]),
+              [Server]),
     http_utils:'200'(yongle, Hdrs, Req, State).
 
 handle_receive(Hdrs, Req, State) ->
     {ok, Binary, _} = cowboy_req:body(Req),
-    io:format("In receive Bin is ~p~n", [bert:decode(base64:decode(Binary))]),
-    http_utils:'200'(yongle, Hdrs, Req, State).
-
+    Server = bert:decode(base64:decode(Binary)),
+    Timeout = cache_srv:rx(Server, self()),
+    io:format("Timeout is ~p~n", [Timeout]),
+    {Status, R} = receive
+                      {tcp_closed, Socket} -> {close, ok};
+                      {error, timeout}     -> {ok, timeout};
+                      {msg, Data}          -> {ok, Data}
+                  after
+                      Timeout -> {ok, {timeout, now()}}
+                  end,
+    case Status of
+        ok    -> http_utils:'200'(R, Hdrs, Req, State);
+        close -> ok
+    end.
 
 terminate(_Reason, _Req, _State) ->
     ok.

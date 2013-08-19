@@ -31,7 +31,8 @@ start_link() ->
 
 init([]) ->
 
-    EPMD = ?CHILD(epmd_srv, worker),
+    EPMD  = ?CHILD(epmd_srv, worker),
+    Cache = ?CHILD(cache_srv, worker),
 
-    {ok, { {one_for_one, 5, 10}, [EPMD]} }.
+    {ok, { {one_for_one, 5, 10}, [EPMD, Cache]} }.
 
