@@ -1,3 +1,5 @@
+<img src='https://raw.github.com/hypernumbers/erlang-wtd/master/priv/images/erlang-wtd.png' />
+
 Erlang WTD EPMD
 ===============
 
