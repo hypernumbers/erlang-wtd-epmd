@@ -86,7 +86,7 @@ handle_transmission(Hdrs, Req, State) ->
     Msg = bert:decode(base64:decode(Binary)),
     #signed_request{public_key = PubK,
                     signature  = Sig,
-                    request    = RemoteReq} = Msg,
+                    body       = RemoteReq} = Msg,
     io:format("PubK is ~p~nSig is ~p~nRemoteReq is ~p~n",
               [PubK, Sig, RemoteReq]),
     #request{node      = Node,
